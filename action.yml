@@ -1,0 +1,20 @@
+name: 'Run launch scripts'
+description: 'Run launch scripts when the github ec2 runner is started'
+inputs:
+  runner-ssh-key:
+    description: >-
+      public key for ssh access to the runner, for troubleshooting purpose
+    required: true
+    
+runs:
+  using: "composite"
+  steps:
+    - name: Install and start docker, make it available for current user
+      run: |
+        sudo yum install -y docker
+        sudo systemctl start docker
+        sudo chmod o+rw /var/run/docker.sock
+      shell: bash
+    - name: add public ssh key to ec2-user
+      run: echo "${{ inputs.runner-ssh-key }}" >> /home/ec2-user/.ssh/authorized_keys
+      shell: bash
